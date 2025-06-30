@@ -75,8 +75,8 @@ A JSON array of task objects that match the query, with the same structure as `l
 - Tag filters:
   - `no tags` - Tasks with no tags
   - `has tags` - Tasks with at least one tag
-  - `tags include #tag` - Tasks with tags containing "tag"
-  - `tags do not include #tag` - Tasks without tags containing "tag" 
+  - `tag include #tag` - Tasks with tags containing "tag"
+  - `tag do not include #tag` - Tasks without tags containing "tag" 
 
 - Path filters:
   - `path includes string` - Tasks in files with paths containing "string"
@@ -96,7 +96,7 @@ A JSON array of task objects that match the query, with the same structure as `l
 ```
 not done
 due before 2025-05-01
-tags include #work
+tag include #work
 ```
 This would return all incomplete tasks due before May 1, 2025, that have the #work tag.
 
