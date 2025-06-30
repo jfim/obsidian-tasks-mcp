@@ -206,7 +206,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Allows filtering tasks by status, dates, description, tags, priority, and path. " +
           "Each line in the query is treated as a filter with AND logic between lines. " +
           "Returns only tasks that match all query conditions. " +
-          "Examples of task filters are `done`, `not done`, `tags include #foo/bar`, `tags do not include #potato`, `description includes keyword`. " +
+          "Examples of task filters are `done`, `not done`, `tag include #foo/bar`, `tag do not include #potato`, `description includes keyword`. " +
           "The path parameter is optional; if not specified, it defaults to the vault root directory. " +
           "The path must be relative to the vault directory and cannot contain directory traversal components (..).",
         inputSchema: zodToJsonSchema(QueryTasksArgsSchema) as ToolInput,
