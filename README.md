@@ -231,7 +231,9 @@ The server recognizes the following Obsidian Tasks format:
 
 - Task syntax: `- [ ] Task description`
 - Completed task: `- [x] Task description`
-- Due date: `🗓️ YYYY-MM-DD`
+- Due date: 
+  - `🗓️ YYYY-MM-DD`
+  - `📅 YYYY-MM-DD`
 - Scheduled date: `⏳ YYYY-MM-DD`
 - Start date: `🛫 YYYY-MM-DD`
 - Created date: `➕ YYYY-MM-DD`
