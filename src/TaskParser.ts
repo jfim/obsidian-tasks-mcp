@@ -57,7 +57,7 @@ export class TaskRegex {
   static readonly hashTags = /(^|\s)#[^ !@#$%^&*(),.?":{}|<>]+/g;
   
   // Date related regular expressions - matches emoji followed by date
-  static readonly dueDateRegex = /🗓️\s?(\d{4}-\d{2}-\d{2})/;
+  static readonly dueDateRegex = /[📅🗓️]\s?(\d{4}-\d{2}-\d{2})/;
   static readonly scheduledDateRegex = /⏳\s?(\d{4}-\d{2}-\d{2})/;
   static readonly startDateRegex = /🛫\s?(\d{4}-\d{2}-\d{2})/;
   static readonly createdDateRegex = /➕\s?(\d{4}-\d{2}-\d{2})/;
