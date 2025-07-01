@@ -7,6 +7,7 @@ const testTasks = [
   `- [ ] Task with #tag`,
   `- [ ] Task with high priority ⏫`,
   `- [ ] Task due today 🗓️ 2025-04-18`,
+  `- [ ] Task due today 📅 2025-04-18`, // The correct emoji for the ootb tasks plugin
   `- [x] Completed task`,
   `- [ ] Task in another file`
 ];
