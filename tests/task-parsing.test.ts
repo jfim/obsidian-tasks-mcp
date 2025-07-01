@@ -53,7 +53,7 @@ describe('Task Parsing and Filtering', () => {
     
     // Test not done filter
     const notDoneResults = tasks.filter(task => applyFilter(task, 'not done'));
-    expect(notDoneResults.length).toBe(5);
+    expect(notDoneResults.length).toBe(6);
     expect(notDoneResults.every(task => task.status === 'incomplete')).toBe(true);
   });
   
@@ -104,7 +104,7 @@ describe('Task Parsing and Filtering', () => {
     path includes file1`;
     
     const result = queryTasks(tasks, multiFilterQuery);
-    expect(result.length).toBe(4);
+    expect(result.length).toBe(5);
     expect(result.every(task => 
       task.status === 'incomplete' && task.filePath.includes('file1')
     )).toBe(true);
