@@ -7,6 +7,7 @@
 - [ ] Task with medium priority 🔼
 - [ ] Task with low priority 🔽
 - [ ] Task due today 🗓️ 2025-04-18
+- [ ] Task due today 📅 2025-04-18
 - [ ] Task scheduled for tomorrow ⏳ 2025-04-19
 - [ ] Task starts next week 🛫 2025-04-25
 - [ ] Task created yesterday ➕ 2025-04-17
