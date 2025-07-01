@@ -23,7 +23,7 @@ describe('Task Parsing and Filtering', () => {
   
   test('parseTaskLine should parse tasks correctly', () => {
     // Check that we parsed the expected number of tasks
-    expect(tasks.length).toBe(6);
+    expect(tasks.length).toBe(7);
     
     // Check that task properties are set correctly
     expect(tasks[0].description).toBe('Basic task');
@@ -37,9 +37,12 @@ describe('Task Parsing and Filtering', () => {
     
     // Task with due date
     expect(tasks[3].dueDate).toBe('2025-04-18');
+
+     // Task with due date
+    expect(tasks[4].dueDate).toBe('2025-04-18');
     
     // Completed task
-    expect(tasks[4].status).toBe('complete');
+    expect(tasks[5].status).toBe('complete');
   });
   
   test('applyFilter should filter tasks by done status', () => {
