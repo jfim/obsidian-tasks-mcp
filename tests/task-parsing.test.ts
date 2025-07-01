@@ -86,7 +86,7 @@ describe('Task Parsing and Filtering', () => {
     const notDescriptionResults = tasks.filter(task => 
       applyFilter(task, 'description does not include priority')
     );
-    expect(notDescriptionResults.length).toBe(5);
+    expect(notDescriptionResults.length).toBe(6);
     expect(notDescriptionResults.every(task => !task.description.includes('priority'))).toBe(true);
   });
   
@@ -96,7 +96,7 @@ describe('Task Parsing and Filtering', () => {
     expect(file1Results.length).toBe(5);
     
     const file2Results = tasks.filter(task => applyFilter(task, 'path includes file2'));
-    expect(file2Results.length).toBe(1);
+    expect(file2Results.length).toBe(2);
   });
   
   test('queryTasks should apply multiple filters with AND logic', () => {

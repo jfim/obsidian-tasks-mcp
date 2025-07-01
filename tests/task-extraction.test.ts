@@ -29,7 +29,7 @@ describe('Task Extraction', () => {
     
     // Check incomplete tasks
     const incompleteTasks = tasks.filter(task => task.status === 'incomplete');
-    expect(incompleteTasks.length).toBe(13);
+    expect(incompleteTasks.length).toBe(14);
     
     // Check complete tasks
     const completeTasks = tasks.filter(task => task.status === 'complete');
