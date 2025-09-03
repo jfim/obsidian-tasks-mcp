@@ -227,7 +227,8 @@ Claude Desktop configuration:
 
 ## Task Format
 
-The server recognizes the following Obsidian Tasks format:
+The server supports both **Obsidian Tasks emoji format** and **Dataview format** for task metadata.
+
 
 - Task syntax: `- [ ] Task description`
 - Completed task: `- [x] Task description`

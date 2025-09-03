@@ -58,7 +58,7 @@ Add this configuration to your Claude client that supports MCP:
 
 ## Features
 
-This MCP server provides the following tools:
+This MCP server provides tools for querying Obsidian tasks in both **emoji format** and **Dataview format**:
 
 ### list_all_tasks
 
