@@ -67,6 +67,15 @@ export class TaskRegex {
   
   // Recurrence
   static readonly recurrenceRegex = /🔁\s?(.*?)(?=(\s|$))/;
+  
+  // Dataview format regular expressions - matches [field:: value] format
+  static readonly dataviewDueDateRegex = /\[due::\s*(\d{4}-\d{2}-\d{2})\]/;
+  static readonly dataviewScheduledDateRegex = /\[scheduled::\s*(\d{4}-\d{2}-\d{2})\]/;
+  static readonly dataviewStartDateRegex = /\[start::\s*(\d{4}-\d{2}-\d{2})\]/;
+  static readonly dataviewCreatedDateRegex = /\[created::\s*(\d{4}-\d{2}-\d{2})\]/;
+  static readonly dataviewCompletionDateRegex = /\[completion::\s*(\d{4}-\d{2}-\d{2})\]/;
+  static readonly dataviewPriorityRegex = /\[priority::\s*(highest|high|medium|low|lowest)\]/;
+  static readonly dataviewRecurrenceRegex = /\[repeat::\s*(.*?)\]/;
 }
 
 /**
@@ -108,28 +117,39 @@ export function parseTaskLine(line: string, filePath: string = '', lineNumber: n
     .map(tag => tag.trim())
     .filter(tag => tag.length > 0);
   
-  // Check for dates
-  const dueMatch = description.match(TaskRegex.dueDateRegex);
-  const scheduledMatch = description.match(TaskRegex.scheduledDateRegex);
-  const startMatch = description.match(TaskRegex.startDateRegex);
-  const createdMatch = description.match(TaskRegex.createdDateRegex);
-  const recurrenceMatch = description.match(TaskRegex.recurrenceRegex);
+  // Check for dates - try emoji format first, then Dataview format
+  const dueMatch = description.match(TaskRegex.dueDateRegex) || 
+                   description.match(TaskRegex.dataviewDueDateRegex);
+  const scheduledMatch = description.match(TaskRegex.scheduledDateRegex) || 
+                         description.match(TaskRegex.dataviewScheduledDateRegex);
+  const startMatch = description.match(TaskRegex.startDateRegex) || 
+                     description.match(TaskRegex.dataviewStartDateRegex);
+  const createdMatch = description.match(TaskRegex.createdDateRegex) || 
+                       description.match(TaskRegex.dataviewCreatedDateRegex);
+  const recurrenceMatch = description.match(TaskRegex.recurrenceRegex) || 
+                          description.match(TaskRegex.dataviewRecurrenceRegex);
   
   // Determine priority - check for highest priority first
   let priority = undefined;
   
-  // Use regex to find all priority markers in order of appearance
-  const priorityMatches = description.match(/⏫⏫|⏫|🔼|🔽|⏬/g);
-  
-  if (priorityMatches && priorityMatches.length > 0) {
-    // Use the first priority marker found
-    const firstPriority = priorityMatches[0];
+  // First check for Dataview priority format
+  const dataviewPriorityMatch = description.match(TaskRegex.dataviewPriorityRegex);
+  if (dataviewPriorityMatch) {
+    priority = dataviewPriorityMatch[1]; // This will be 'highest', 'high', 'medium', 'low', or 'lowest'
+  } else {
+    // Use regex to find all emoji priority markers in order of appearance
+    const priorityMatches = description.match(/⏫⏫|⏫|🔼|🔽|⏬/g);
     
-    if (firstPriority === '⏫⏫') priority = 'highest';
-    else if (firstPriority === '⏫') priority = 'high';
-    else if (firstPriority === '🔼') priority = 'medium';
-    else if (firstPriority === '🔽') priority = 'low';
-    else if (firstPriority === '⏬') priority = 'lowest';
+    if (priorityMatches && priorityMatches.length > 0) {
+      // Use the first priority marker found
+      const firstPriority = priorityMatches[0];
+      
+      if (firstPriority === '⏫⏫') priority = 'highest';
+      else if (firstPriority === '⏫') priority = 'high';
+      else if (firstPriority === '🔼') priority = 'medium';
+      else if (firstPriority === '🔽') priority = 'low';
+      else if (firstPriority === '⏬') priority = 'lowest';
+    }
   }
   
   // Create a unique ID
