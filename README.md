@@ -65,12 +65,31 @@ A JSON array of task objects that match the query, with the same structure as `l
   - `done` - Show completed tasks
   - `not done` - Show incomplete tasks
 
-- Date filters:
+- Date filters (due):
+  - Note on semantics: `due today` is an exact match (only tasks due exactly today). Use range operators to include earlier/later dates.
   - `due today` - Tasks due today
-  - `due before today` - Tasks due before today
-  - `due after today` - Tasks due after today
+  - `due before today` - Tasks due before today (exclusive)
+  - `due after today` - Tasks due after today (exclusive)
+  - `due on or before today` - Tasks due today or earlier (inclusive)
+  - `due on or after today` - Tasks due today or later (inclusive)
+  - `due on YYYY-MM-DD` or `due YYYY-MM-DD` - Tasks due on a specific date
+  - `due before YYYY-MM-DD` - Tasks due before a date (exclusive)
+  - `due after YYYY-MM-DD` - Tasks due after a date (exclusive)
+  - `due on or before YYYY-MM-DD` - Tasks due on/before a date (inclusive)
+  - `due on or after YYYY-MM-DD` - Tasks due on/after a date (inclusive)
   - `no due date` - Tasks with no due date
   - `has due date` - Tasks with a due date
+
+- Start date filters:
+  - Note on semantics: `starts today` is an exact match (only tasks that start today). Use range operators to include earlier/later dates.
+  - `starts today` - Tasks starting today
+  - `starts on YYYY-MM-DD` or `starts YYYY-MM-DD` - Start on a specific date
+  - `starts before YYYY-MM-DD` - Start before a date (exclusive)
+  - `starts after YYYY-MM-DD` - Start after a date (exclusive)
+  - `starts on or before YYYY-MM-DD` - Start on/before a date (inclusive)
+  - `starts on or after YYYY-MM-DD` - Start on/after a date (inclusive)
+  - `no start date` - Tasks with no start date
+  - `has start date` - Tasks with a start date
 
 - Tag filters:
   - `no tags` - Tasks with no tags
@@ -99,6 +118,11 @@ due before 2025-05-01
 tag include #work
 ```
 This would return all incomplete tasks due before May 1, 2025, that have the #work tag.
+
+Inclusive OR example (single line):
+```
+due on or before today OR starts on or before today
+```
 
 ## Usage
 

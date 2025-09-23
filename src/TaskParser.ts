@@ -193,9 +193,20 @@ export function applyFilter(task: Task, filter: string): boolean {
     return parts.every(part => applyFilter(task, part.trim()));
   }
   
+  // Support boolean OR while preserving inclusive date phrases like "on or before/after"
   if (filter.includes(' or ')) {
-    const parts = filter.split(' or ');
-    return parts.some(part => applyFilter(task, part.trim()));
+    // Temporarily mask inclusive phrases so we don't split inside them
+    const masked = filter
+      .split(' on or before ').join(' on __OR_BEFORE__ ')
+      .split(' on or after ').join(' on __OR_AFTER__ ');
+    const parts: string[] = masked.split(' or ').map((segment: string) =>
+      segment
+        .split('__OR_BEFORE__').join('or before')
+        .split('__OR_AFTER__').join('or after')
+    );
+    if (parts.length > 1) {
+      return parts.some((part: string) => applyFilter(task, part.trim()));
+    }
   }
   
   if (filter.startsWith('not ')) {
@@ -220,17 +231,24 @@ export function applyFilter(task: Task, filter: string): boolean {
   
   // Due date filters
   if (filter.startsWith('due') || filter === 'has due date' || filter === 'no due date') {
+    // Common helpers
+    const today = moment().format('YYYY-MM-DD');
+    const hasDue = task.dueDate !== undefined;
+
     if (filter === 'due today') {
-      const today = moment().format('YYYY-MM-DD');
       return task.dueDate === today;
     }
     if (filter === 'due before today') {
-      const today = moment().format('YYYY-MM-DD');
       return task.dueDate !== undefined && task.dueDate < today;
     }
     if (filter === 'due after today') {
-      const today = moment().format('YYYY-MM-DD');
       return task.dueDate !== undefined && task.dueDate > today;
+    }
+    if (filter === 'due on or before today') {
+      return hasDue && task.dueDate! <= today;
+    }
+    if (filter === 'due on or after today') {
+      return hasDue && task.dueDate! >= today;
     }
     if (filter === 'no due date') {
       return task.dueDate === undefined;
@@ -259,6 +277,65 @@ export function applyFilter(task: Task, filter: string): boolean {
     if (dueAfterMatch) {
       const targetDate = dueAfterMatch[1];
       return task.dueDate !== undefined && task.dueDate > targetDate;
+    }
+
+    // Inclusive variants
+    const dueOnOrBeforeMatch = filter.match(/^due\s+on\s+or\s+before\s+(\d{4}-\d{2}-\d{2})$/);
+    if (dueOnOrBeforeMatch) {
+      const targetDate = dueOnOrBeforeMatch[1];
+      return hasDue && task.dueDate! <= targetDate;
+    }
+    const dueOnOrAfterMatch = filter.match(/^due\s+on\s+or\s+after\s+(\d{4}-\d{2}-\d{2})$/);
+    if (dueOnOrAfterMatch) {
+      const targetDate = dueOnOrAfterMatch[1];
+      return hasDue && task.dueDate! >= targetDate;
+    }
+  }
+
+  // Start date filters
+  if (filter.startsWith('starts') || filter === 'has start date' || filter === 'no start date') {
+    const today = moment().format('YYYY-MM-DD');
+    const hasStart = task.startDate !== undefined;
+
+    if (filter === 'starts today') {
+      return task.startDate === today;
+    }
+    if (filter === 'no start date') {
+      return !hasStart;
+    }
+    if (filter === 'has start date') {
+      return hasStart;
+    }
+
+    // Specific date equality: "starts on 2025-09-23" or "starts 2025-09-23"
+    const startEq = filter.match(/^starts\s+(?:on\s+)?(\d{4}-\d{2}-\d{2})$/);
+    if (startEq) {
+      const targetDate = startEq[1];
+      return task.startDate === targetDate;
+    }
+
+    // Exclusive before/after
+    const startsBefore = filter.match(/^starts\s+before\s+(\d{4}-\d{2}-\d{2})$/);
+    if (startsBefore) {
+      const targetDate = startsBefore[1];
+      return hasStart && task.startDate! < targetDate;
+    }
+    const startsAfter = filter.match(/^starts\s+after\s+(\d{4}-\d{2}-\d{2})$/);
+    if (startsAfter) {
+      const targetDate = startsAfter[1];
+      return hasStart && task.startDate! > targetDate;
+    }
+
+    // Inclusive on or before/after
+    const startsOnOrBefore = filter.match(/^starts\s+on\s+or\s+before\s+(\d{4}-\d{2}-\d{2})$/);
+    if (startsOnOrBefore) {
+      const targetDate = startsOnOrBefore[1];
+      return hasStart && task.startDate! <= targetDate;
+    }
+    const startsOnOrAfter = filter.match(/^starts\s+on\s+or\s+after\s+(\d{4}-\d{2}-\d{2})$/);
+    if (startsOnOrAfter) {
+      const targetDate = startsOnOrAfter[1];
+      return hasStart && task.startDate! >= targetDate;
     }
   }
   

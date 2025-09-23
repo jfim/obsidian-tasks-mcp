@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import moment from 'moment';
 
 // Import the functions to test
 import { findAllTasks, queryTasks } from '../src/index.js';
@@ -107,5 +108,85 @@ priority is high`;
     expect(tasksWithoutText.every(task => 
       !task.description.toLowerCase().includes('priority')
     )).toBe(true);
+  });
+
+  test('queryTasks with due date equals should return tasks due on that date', async () => {
+    const allTasks = await findAllTasks(testVaultPath);
+    const targetDate = '2025-04-18';
+    const query = `due on ${targetDate}`;
+
+    const filteredTasks = queryTasks(allTasks, query);
+
+    expect(filteredTasks.length).toBeGreaterThan(0);
+    expect(filteredTasks.every(task => task.dueDate === targetDate)).toBe(true);
+  });
+
+  test('queryTasks with inclusive due filters should include boundary date', async () => {
+    const allTasks = await findAllTasks(testVaultPath);
+
+    // on or before 2025-04-18 should include tasks due 2025-04-18 and earlier
+    const onOrBefore = queryTasks(allTasks, 'due on or before 2025-04-18');
+    // Debug context to understand failures
+    // eslint-disable-next-line no-console
+    console.log('All due dates:', allTasks.filter(t => t.dueDate).map(t => t.dueDate));
+    // eslint-disable-next-line no-console
+    console.log('onOrBefore count:', onOrBefore.length);
+    expect(onOrBefore.length).toBeGreaterThan(0);
+    expect(onOrBefore.every(task => task.dueDate && task.dueDate <= '2025-04-18')).toBe(true);
+
+    // on or after 2025-04-17 should include tasks due 2025-04-17 and later
+    const onOrAfter = queryTasks(allTasks, 'due on or after 2025-04-17');
+    expect(onOrAfter.length).toBeGreaterThan(0);
+    expect(onOrAfter.every(task => task.dueDate && task.dueDate >= '2025-04-17')).toBe(true);
+  });
+
+  test('queryTasks with start date equals should return tasks starting on that date', async () => {
+    const allTasks = await findAllTasks(testVaultPath);
+    const targetDate = '2025-04-25';
+    const query = `starts on ${targetDate}`;
+
+    const filteredTasks = queryTasks(allTasks, query);
+
+    expect(filteredTasks.length).toBeGreaterThan(0);
+    expect(filteredTasks.every(task => task.startDate === targetDate)).toBe(true);
+  });
+
+  test('queryTasks supports "starts today" (dynamic)', async () => {
+    const today = moment().format('YYYY-MM-DD');
+    const tempFile = path.join(testVaultPath, 'starts-today.temp.md');
+    const content = `# Temp file for starts today test\n- [ ] Thing to do 🛫 ${today}`;
+
+    try {
+      await fs.writeFile(tempFile, content, 'utf-8');
+      const allTasks = await findAllTasks(testVaultPath);
+      const filteredTasks = queryTasks(allTasks, 'starts today');
+
+      expect(filteredTasks.length).toBeGreaterThan(0);
+      expect(filteredTasks.every(task => task.startDate === today)).toBe(true);
+    } finally {
+      // Cleanup so other tests are not affected
+      try { await fs.unlink(tempFile); } catch {}
+    }
+  });
+
+  test('queryTasks supports OR with inclusive date phrases', async () => {
+    const tempFile = path.join(testVaultPath, 'or-inclusive.temp.md');
+    const content = `# Temp file for OR inclusive test\n- [ ] Far future due only 🗓️ 2099-01-01\n- [ ] Old start only 🛫 2000-01-01`;
+    try {
+      await fs.writeFile(tempFile, content, 'utf-8');
+      const allTasks = await findAllTasks(testVaultPath);
+      const query = 'due on or before 2000-01-01 or starts on or before 2000-01-01';
+      const filtered = queryTasks(allTasks, query);
+
+      expect(filtered.length).toBeGreaterThan(0);
+      // Must include the start-only task
+      expect(filtered.some(t => t.startDate === '2000-01-01')).toBe(true);
+      // And no need to include the far future due-only task
+      expect(filtered.some(t => t.description.includes('Far future due only'))).toBe(false);
+      // Sanity: every match satisfies at least one side of the OR
+      expect(filtered.every(t => (t.dueDate && t.dueDate <= '2000-01-01') || (t.startDate && t.startDate <= '2000-01-01'))).toBe(true);
+    } finally {
+      try { await fs.unlink(tempFile); } catch {}
+    }
   });
 });
