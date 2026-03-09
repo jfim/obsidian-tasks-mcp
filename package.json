@@ -18,7 +18,7 @@
     "url": "git+https://github.com/jfim/obsidian-tasks-mcp.git"
   },
   "bin": {
-    "obsidian-tasks-mcp": "dist/src/index.js"
+    "obsidian-tasks-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -26,7 +26,7 @@
   ],
   "readme": "NPM-README.md",
   "scripts": {
-    "build": "tsc && shx chmod +x dist/src/*.js",
+    "build": "tsc && shx chmod +x dist/*.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"

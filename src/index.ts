@@ -132,7 +132,8 @@ const server = new Server(
 import { parseTasks, queryTasks as filterTasks, taskToString, Task } from './TaskParser.js';
 
 export async function findAllMarkdownFiles(startPath: string): Promise<string[]> {
-  const pattern = path.join(startPath, '**/*.md');
+  // glob requires forward slashes even on Windows
+  const pattern = startPath.replace(/\\/g, '/') + '/**/*.md';
   return glob(pattern);
 }
 

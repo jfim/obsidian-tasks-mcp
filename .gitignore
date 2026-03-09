@@ -1,0 +1,15 @@
+# Development files
+node_modules/
+
+# Obsidian directory
+obsidian-tasks/
+
+# Build artifacts
+*.tsbuildinfo
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
