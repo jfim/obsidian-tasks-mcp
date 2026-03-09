@@ -16,7 +16,8 @@ import { glob } from 'glob';
 
 // Command line argument parsing
 const args = process.argv.slice(2);
-if (args.length === 0 && process.env.NODE_ENV !== 'test') {
+const isTestEnv = process.env.NODE_ENV === 'test';
+if (args.length === 0 && !isTestEnv) {
   console.error("Usage: obsidian-tasks-mcp <vault-directory>");
   process.exit(1);
 }
@@ -34,10 +35,13 @@ export function expandHome(filepath: string): string {
 }
 
 // Set up a single vault directory
-const vaultDirectory = args.length > 0 ? 
-  normalizePath(path.resolve(expandHome(args[0]))) :
-  // For tests, use current directory if no args provided
-  normalizePath(path.resolve(process.cwd()));
+// In test environment, always use current working directory as vault root to avoid Jest args interference
+const vaultDirectory = isTestEnv
+  ? normalizePath(path.resolve(process.cwd()))
+  : (args.length > 0
+      ? normalizePath(path.resolve(expandHome(args[0])))
+      : // Fallback to current directory if somehow no args were provided
+        normalizePath(path.resolve(process.cwd())));
 
 // Validate that the vault directory exists and is accessible
 if (process.env.NODE_ENV !== 'test') {
@@ -203,11 +207,60 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "query_tasks",
         description:
-          "Search for tasks based on Obsidian Tasks query syntax. " +
-          "Allows filtering tasks by status, dates, description, tags, priority, and path. " +
-          "Each line in the query is treated as a filter with AND logic between lines. " +
-          "Returns only tasks that match all query conditions. " +
-          "Examples of task filters are `done`, `not done`, `tag include #foo/bar`, `tag do not include #potato`, `description includes keyword`. " +
+          "Search for tasks using a simplified Obsidian Tasks query syntax.\n" +
+          "- Each line is an AND filter; all lines must match.\n" +
+          "- Within a single line, you may use 'AND' or 'OR'.\n" +
+          "- Use 'not <filter>' to negate a filter.\n" +
+          "- The phrases 'on or before' and 'on or after' are inclusive date operators (not boolean OR).\n\n" +
+          "Exact vs range semantics:\n" +
+          "- `due today` and `starts today` are exact equality matches (only tasks dated exactly today).\n" +
+          "- To include earlier/later dates, use range operators like `before/after` or `on or before/on or after`.\n\n" +
+          "Status filters:\n" +
+          "- `done`\n" +
+          "- `not done`\n\n" +
+          "Due date filters:\n" +
+          "- `due today`\n" +
+          "- `due before today` (exclusive)\n" +
+          "- `due after today` (exclusive)\n" +
+          "- `due on or before today` (inclusive)\n" +
+          "- `due on or after today` (inclusive)\n" +
+          "- `due on YYYY-MM-DD` or `due YYYY-MM-DD`\n" +
+          "- `due before YYYY-MM-DD` (exclusive)\n" +
+          "- `due after YYYY-MM-DD` (exclusive)\n" +
+          "- `due on or before YYYY-MM-DD` (inclusive)\n" +
+          "- `due on or after YYYY-MM-DD` (inclusive)\n" +
+          "- `no due date` / `has due date`\n\n" +
+          "Start date filters:\n" +
+          "- `starts today`\n" +
+          "- `starts on YYYY-MM-DD` or `starts YYYY-MM-DD`\n" +
+          "- `starts before YYYY-MM-DD` (exclusive)\n" +
+          "- `starts after YYYY-MM-DD` (exclusive)\n" +
+          "- `starts on or before YYYY-MM-DD` (inclusive)\n" +
+          "- `starts on or after YYYY-MM-DD` (inclusive)\n" +
+          "- `no start date` / `has start date`\n\n" +
+          "Tag filters:\n" +
+          "- `no tags` / `has tags`\n" +
+          "- `tag includes #foo/bar`\n" +
+          "- `has tag #exact`\n\n" +
+          "Path filters:\n" +
+          "- `path includes some/folder`\n" +
+          "- `path does not include archive`\n\n" +
+          "Description filters:\n" +
+          "- `description includes keyword`\n" +
+          "- `description does not include keyword`\n\n" +
+          "Priority filters:\n" +
+          "- `priority is highest|high|medium|low|lowest|none`\n\n" +
+          "Example multi-line query (AND across lines):\n" +
+          "``" + "`\n" +
+          "not done\n" +
+          "due on or before 2025-05-01\n" +
+          "tag includes #work\n" +
+          "priority is high\n" +
+          "``" + "`\n\n" +
+          "Example \"tasks that need attention today\" query demonstrating single-line OR (and inclusive date operators):\n" +
+          "``" + "`\n" +
+          "due on or before today OR starts on or before today\n" +
+          "``" + "`\n\n" +
           "The path parameter is optional; if not specified, it defaults to the vault root directory. " +
           "The path must be relative to the vault directory and cannot contain directory traversal components (..).",
         inputSchema: zodToJsonSchema(QueryTasksArgsSchema) as ToolInput,
