@@ -1,12 +1,16 @@
 # Development files
 node_modules/
 
+# IDE
+.idea/
+
 # Obsidian directory
 obsidian-tasks/
 
 # Build artifacts
 *.tsbuildinfo
 dist/
+*.tgz
 
 # Logs
 npm-debug.log*

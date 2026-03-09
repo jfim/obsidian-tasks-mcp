@@ -94,8 +94,8 @@ A JSON array of task objects that match the query, with the same structure as `l
 - Tag filters:
   - `no tags` - Tasks with no tags
   - `has tags` - Tasks with at least one tag
-  - `tag include #tag` - Tasks with tags containing "tag"
-  - `tag do not include #tag` - Tasks without tags containing "tag" 
+  - `tag includes #tag` - Tasks with tags containing "tag"
+  - `tag does not include #tag` - Tasks without tags containing "tag"
 
 - Path filters:
   - `path includes string` - Tasks in files with paths containing "string"
@@ -106,9 +106,11 @@ A JSON array of task objects that match the query, with the same structure as `l
   - `description does not include string` - Tasks with descriptions not containing "string"
 
 - Priority filters:
+  - `priority is highest` - Tasks with highest priority
   - `priority is high` - Tasks with high priority
   - `priority is medium` - Tasks with medium priority
   - `priority is low` - Tasks with low priority
+  - `priority is lowest` - Tasks with lowest priority
   - `priority is none` - Tasks with no priority
 
 **Example Query:**
@@ -165,12 +167,6 @@ From source:
 node dist/index.js /path/to/obsidian/vault
 ```
 
-You can specify multiple directories:
-
-```bash
-npx @jfim/obsidian-tasks-mcp /path/to/obsidian/vault /another/directory
-```
-
 ### Testing
 
 To run the test suite:
@@ -207,7 +203,7 @@ If you installed from source:
     "obsidian-tasks": {
       "command": "node",
       "args": [
-        "/path/to/obsidian-tasks-mcp/dist/index.js",
+        "/path/to/obsidian-tasks-mcp/dist/src/index.js",
         "/path/to/obsidian/vault"
       ]
     }
